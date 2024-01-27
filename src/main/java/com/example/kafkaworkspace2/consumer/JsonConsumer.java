@@ -13,7 +13,7 @@ import static com.example.kafkaworkspace2.model.Topic.JS_JSON_TOPIC;
 public class JsonConsumer {
     @KafkaListener(
             topics = { JS_JSON_TOPIC },
-            groupId = "js-consumer-group"
+            groupId = "js-json-consumer-group"
     )
     public void accept(ConsumerRecord<String, Data> message) {
         log.info("[json consumer] - " + message.value());
