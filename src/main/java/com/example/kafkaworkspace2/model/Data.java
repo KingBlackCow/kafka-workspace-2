@@ -1,9 +1,7 @@
 package com.example.kafkaworkspace2.model;
 
-import lombok.Data;
-
-@Data
-public class JsMessage {
+@lombok.Data
+public class Data {
     private int id;
     private int age;
     private String name;

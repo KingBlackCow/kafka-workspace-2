@@ -9,7 +9,7 @@ import static com.example.kafkaworkspace2.model.Topic.JS_STRING_TOPIC;
 
 @Component
 @Slf4j
-public class JsConsumer2 {
+public class StringConsumer {
     @KafkaListener(
             topics = {JS_STRING_TOPIC},
             groupId = "test-consumer-group",

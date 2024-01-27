@@ -9,7 +9,7 @@ import static com.example.kafkaworkspace2.model.Topic.JS_STRING_TOPIC;
 
 @Component
 @RequiredArgsConstructor
-public class JsProducer2 {
+public class StringProducer {
 
     @Qualifier("secondKafkaTemplate")
     private final KafkaTemplate<String, String> secondKafkaTemplate;

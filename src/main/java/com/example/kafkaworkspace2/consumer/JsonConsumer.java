@@ -1,6 +1,6 @@
 package com.example.kafkaworkspace2.consumer;
 
-import com.example.kafkaworkspace2.model.JsMessage;
+import com.example.kafkaworkspace2.model.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -10,12 +10,12 @@ import static com.example.kafkaworkspace2.model.Topic.JS_JSON_TOPIC;
 
 @Component
 @Slf4j
-public class JsConsumer {
+public class JsonConsumer {
     @KafkaListener(
             topics = { JS_JSON_TOPIC },
             groupId = "js-consumer-group"
     )
-    public void accept(ConsumerRecord<String, JsMessage> message) {
+    public void accept(ConsumerRecord<String, Data> message) {
         log.info("[json consumer] - " + message.value());
     }
 }
