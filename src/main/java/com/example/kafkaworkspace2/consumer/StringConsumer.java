@@ -12,7 +12,7 @@ import static com.example.kafkaworkspace2.model.Topic.JS_STRING_TOPIC;
 public class StringConsumer {
     @KafkaListener(
             topics = {JS_STRING_TOPIC},
-            groupId = "test-consumer-group",
+            groupId = "string-consumer-group",
             containerFactory = "secondKafkaListenerContainerFactory"
     )
     public void accept(ConsumerRecord<String, String> message) {
