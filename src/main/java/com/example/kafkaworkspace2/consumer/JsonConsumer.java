@@ -4,6 +4,7 @@ import com.example.kafkaworkspace2.model.JsMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import static com.example.kafkaworkspace2.model.Topic.JS_JSON_TOPIC;
@@ -15,7 +16,9 @@ public class JsonConsumer {
             topics = { JS_JSON_TOPIC },
             groupId = "js-json-consumer-group"
     )
-    public void accept(ConsumerRecord<String, JsMessage> message) {
+    public void accept(ConsumerRecord<String, JsMessage> message, Acknowledgment acknowledgment) {
         log.info("[json consumer] - " + message.value());
+        // 수동 커밋 설정
+        // acknowledgment.acknowledge();
     }
 }
