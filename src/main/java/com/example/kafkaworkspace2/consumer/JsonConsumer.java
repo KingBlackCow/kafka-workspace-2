@@ -20,7 +20,8 @@ public class JsonConsumer {
 
     @KafkaListener(
             topics = {JS_JSON_TOPIC},
-            groupId = "js-json-consumer-group"
+            groupId = "js-json-consumer-group",
+            concurrency = "3"
     )
     public void accept(ConsumerRecord<String, JsMessage> message, Acknowledgment acknowledgment) {
         log.info("[json consumer] - " + message.value());

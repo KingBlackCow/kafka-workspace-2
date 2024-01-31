@@ -31,6 +31,7 @@ public class BatchKafkaConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         props.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, "false");
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, ConsumerConfig.DEFAULT_MAX_POLL_RECORDS);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
@@ -48,8 +49,10 @@ public class BatchKafkaConfig {
          * conatiner.ackMode: batch
          */
         factory.setBatchListener(true);
-        factory.setConcurrency(1);
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.BATCH);
+//        factory.setConcurrency(1);
+
+//        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.BATCH);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
 
         return factory;
     }

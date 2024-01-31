@@ -67,7 +67,7 @@ public class JsonKafkaConfig {
     ) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
-        factory.setConcurrency(1);
+//        factory.setConcurrency(1);
         // 수동 커밋 설정
          factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
