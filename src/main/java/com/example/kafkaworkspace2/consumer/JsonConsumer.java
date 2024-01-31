@@ -19,6 +19,6 @@ public class JsonConsumer {
     public void accept(ConsumerRecord<String, JsMessage> message, Acknowledgment acknowledgment) {
         log.info("[json consumer] - " + message.value());
         // 수동 커밋 설정
-        // acknowledgment.acknowledge();
+         acknowledgment.acknowledge();
     }
 }

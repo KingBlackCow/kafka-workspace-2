@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class JsonKafkaConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getKeySerializer());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getValueSerializer());
         props.put(ProducerConfig.ACKS_CONFIG, kafkaProperties.getProducer().getAcks());
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true"); // eos 설정, spring.kafka.json.producer.acks: -1 설정필요
         return new DefaultKafkaProducerFactory<>(props);
     }
 
@@ -54,7 +56,7 @@ public class JsonKafkaConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         props.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, "false");
         // 수동 커밋 설정
-        // props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
@@ -67,7 +69,7 @@ public class JsonKafkaConfig {
         factory.setConsumerFactory(consumerFactory);
         factory.setConcurrency(1);
         // 수동 커밋 설정
-        // factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
 }
