@@ -33,13 +33,13 @@ public class BatchConsumer {
         ObjectMapper objectMapper = new ObjectMapper();
         messages.forEach(message -> executorService.submit(() -> {
             {
-                JsMessage deserialMessage;
+                JsMessage deserializedMessage;
                 try {
-                    deserialMessage = objectMapper.readValue(message.value(), JsMessage.class);
+                    deserializedMessage = objectMapper.readValue(message.value(), JsMessage.class);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
-                log.info("[Batch Consumer(" + Thread.currentThread().getId() + ")] Value - " + deserialMessage + " / Offset - " + message.offset() + " / Partition - " + message.partition());
+                log.info("[Batch Consumer(" + Thread.currentThread().getId() + ")] Value - " + deserializedMessage + " / Offset - " + message.offset() + " / Partition - " + message.partition());
             }
         }));
         acknowledgment.acknowledge();
