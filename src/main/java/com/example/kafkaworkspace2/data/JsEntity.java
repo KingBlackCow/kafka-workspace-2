@@ -1,9 +1,6 @@
 package com.example.kafkaworkspace2.data;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(value = JsEntityListener.class)
 @Entity(name = "js_entity")
 public class JsEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

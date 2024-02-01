@@ -2,7 +2,6 @@ package com.example.kafkaworkspace2.producer;
 
 import com.example.kafkaworkspace2.common.CustomObjectMapper;
 import com.example.kafkaworkspace2.model.JsCdcMessage;
-import com.example.kafkaworkspace2.model.Topic;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,7 +11,7 @@ import static com.example.kafkaworkspace2.model.Topic.*;
 
 @RequiredArgsConstructor
 @Component
-public class MyCdcProducer {
+public class JsCdcProducer {
 
     CustomObjectMapper objectMapper = new CustomObjectMapper();
 

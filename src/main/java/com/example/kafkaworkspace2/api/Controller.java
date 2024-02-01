@@ -42,12 +42,12 @@ public class Controller {
     }
 
     @PostMapping("/greetings")
-    JsDTO create(@RequestBody Request request) {
+    JsDTO create(@RequestBody Request request) throws JsonProcessingException {
         if (request == null || request.userId == null || request.userName == null || request.userAge == null || request.content == null)
             return null;
 
-        JsDTO myModel = JsDTO.create(request.userId, request.userAge, request.userName, request.content);
-        return jsService.save(myModel);
+        JsDTO jsDTO = JsDTO.create(request.userId, request.userAge, request.userName, request.content);
+        return jsService.save(jsDTO);
     }
 
     @GetMapping("/greetings")
@@ -61,7 +61,7 @@ public class Controller {
     }
 
     @PatchMapping("/greetings/{id}")
-    JsDTO update(@PathVariable Integer id, @RequestBody String content) {
+    JsDTO update(@PathVariable Integer id, @RequestBody String content) throws JsonProcessingException {
         if (id == null || content == null || content.isBlank()) return null;
         JsDTO jsDTO = jsService.findById(id);
         jsDTO.setContent(content);
@@ -69,7 +69,7 @@ public class Controller {
     }
 
     @DeleteMapping("/greetings/{id}")
-    void delete(@PathVariable Integer id) {
+    void delete(@PathVariable Integer id) throws JsonProcessingException {
         jsService.delete(id);
     }
 
