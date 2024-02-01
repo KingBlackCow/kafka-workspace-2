@@ -1,6 +1,8 @@
 package com.example.kafkaworkspace2.consumer;
 
 import com.example.kafkaworkspace2.model.JsMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,26 +18,25 @@ import static com.example.kafkaworkspace2.model.Topic.JS_JSON_TOPIC;
 @Slf4j
 public class JsonConsumer {
 
-    private final Map<String, Integer> idHistoryMap = new ConcurrentHashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<String, Integer> idHistoryMap = new ConcurrentHashMap<>(); // id에 대해 Exactly Once를 보장하기 위함
 
     @KafkaListener(
-            topics = {JS_JSON_TOPIC},
-            groupId = "js-json-consumer-group",
-            concurrency = "3"
+            topics = { JS_JSON_TOPIC },
+            groupId = "test-consumer-group",
+            concurrency = "1"
     )
-    public void accept(ConsumerRecord<String, JsMessage> message, Acknowledgment acknowledgment) {
-        log.info("[json consumer] - " + message.value());
-        // 수동 커밋 설정
-        this.printPayloadIfFirstMessage(message.value());
+    public void listen(ConsumerRecord<String, String> message, Acknowledgment acknowledgment) throws JsonProcessingException {
+        JsMessage myMessage = objectMapper.readValue(message.value(), JsMessage.class);
+        this.printPayloadIfFirstMessage(myMessage);
         acknowledgment.acknowledge();
     }
 
-    private void printPayloadIfFirstMessage(JsMessage jsMessage) {
-        if (idHistoryMap.putIfAbsent(String.valueOf(jsMessage.getId()), 1) == null) {
-            log.info("[json first consumer] - " + jsMessage);
-            idHistoryMap.put(String.valueOf(jsMessage.getId()), 1);
+    private void printPayloadIfFirstMessage(JsMessage myMessage) {
+        if (idHistoryMap.putIfAbsent(String.valueOf(myMessage.getId()), 1) == null) {
+            System.out.println("[Main Consumer(" + Thread.currentThread().getId() + ")] Message arrived! - " + myMessage); // Exactly Once 실행되어야 하는 로직으로 가정
         } else {
-            System.out.println("[json consumer] - Duplicate! id: " + jsMessage.getId());
+            System.out.println("[Main Consumer(" + Thread.currentThread().getId() + ")] Duplicate! (" + myMessage.getId() + ")");
         }
     }
 }

@@ -21,7 +21,7 @@ public class Controller {
     }
 
     @PostMapping("/message")
-    void message(@RequestBody JsMessage message) {
+    void message(@RequestBody JsMessage message) throws JsonProcessingException {
         jsonProducer.sendMessage(message);
     }
 

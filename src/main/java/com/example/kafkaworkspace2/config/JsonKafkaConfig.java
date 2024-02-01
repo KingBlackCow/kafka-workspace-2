@@ -22,7 +22,7 @@ public class JsonKafkaConfig {
 
     @Bean
     @Primary
-    @ConfigurationProperties("spring.kafka.json")
+    @ConfigurationProperties("spring.kafka.string")
     public KafkaProperties kafkaProperties() {
         return new KafkaProperties();
     }
@@ -41,7 +41,7 @@ public class JsonKafkaConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getKeySerializer());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getValueSerializer());
         props.put(ProducerConfig.ACKS_CONFIG, kafkaProperties.getProducer().getAcks());
-        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true"); // eos 설정, spring.kafka.json.producer.acks: -1 설정필요
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "false"); // eos 설정, spring.kafka.json.producer.acks: -1 설정필요
         return new DefaultKafkaProducerFactory<>(props);
     }
 
