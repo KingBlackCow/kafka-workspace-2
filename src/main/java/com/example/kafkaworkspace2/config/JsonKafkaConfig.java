@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.example.kafkaworkspace2.model.Topic.JS_CDC_CUSTOM_TOPIC_DLT;
+
 @Configuration
 @EnableKafka
 public class JsonKafkaConfig {
@@ -68,38 +70,39 @@ public class JsonKafkaConfig {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-    @Bean
-    @Primary
-    CommonErrorHandler errorHandler() {
-        CommonContainerStoppingErrorHandler cseh = new CommonContainerStoppingErrorHandler();
-        AtomicReference<Consumer<? ,?>> consumer2 = new AtomicReference<>();
-        AtomicReference<MessageListenerContainer> container2 = new AtomicReference<>();
-
-        DefaultErrorHandler errorHandler = new DefaultErrorHandler((rec, ex) -> {
-            cseh.handleRemaining(ex, Collections.singletonList(rec), consumer2.get(), container2.get());
-        }, generateBackOff()) {
-
-            @Override
-            public void handleRemaining(
-                    Exception thrownException,
-                    List<ConsumerRecord<?, ?>> records,
-                    Consumer<?, ?> consumer,
-                    MessageListenerContainer container
-            ) {
-                consumer2.set(consumer);
-                container2.set(container);
-                super.handleRemaining(thrownException, records, consumer, container);
-            }
-        };
-        errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
-        return errorHandler;
-    }
+//    @Bean
+//    @Primary
+//    CommonErrorHandler errorHandler() {
+//        CommonContainerStoppingErrorHandler cseh = new CommonContainerStoppingErrorHandler();
+//        AtomicReference<Consumer<? ,?>> consumer2 = new AtomicReference<>();
+//        AtomicReference<MessageListenerContainer> container2 = new AtomicReference<>();
+//
+//        DefaultErrorHandler errorHandler = new DefaultErrorHandler((rec, ex) -> {
+//            cseh.handleRemaining(ex, Collections.singletonList(rec), consumer2.get(), container2.get());
+//        }, generateBackOff()) {
+//
+//            @Override
+//            public void handleRemaining(
+//                    Exception thrownException,
+//                    List<ConsumerRecord<?, ?>> records,
+//                    Consumer<?, ?> consumer,
+//                    MessageListenerContainer container
+//            ) {
+//                consumer2.set(consumer);
+//                container2.set(container);
+//                super.handleRemaining(thrownException, records, consumer, container);
+//            }
+//        };
+//        errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
+//        return errorHandler;
+//    }
 
     @Bean
     @Primary
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
             ConsumerFactory<String, Object> consumerFactory,
-            CommonErrorHandler errorHandler
+            KafkaTemplate<String, Object> kafkaTemplate
+//            CommonErrorHandler errorHandler
     ) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
@@ -130,7 +133,17 @@ public class JsonKafkaConfig {
         /**
          * 커스텀 에러 핸들러: 위의 errorHandler 빈 확인
          */
-        factory.setCommonErrorHandler(errorHandler);
+//        factory.setCommonErrorHandler(errorHandler);
+
+        /**
+         * DeadLetterPublishingRecoverer: 컨슘에 실패한 메시지를 다른 큐에 메시지를 따로 보관하는 방식
+         */
+        //factory.setCommonErrorHandler(new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate), generateBackOff()));
+
+        // 수동 DLT 설정
+        factory.setCommonErrorHandler(new DefaultErrorHandler((record, exception) -> {
+            kafkaTemplate.send(JS_CDC_CUSTOM_TOPIC_DLT, (String) record.key(), record.value());
+        }, generateBackOff()));
 
         // 수동 커밋 설정
          factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
