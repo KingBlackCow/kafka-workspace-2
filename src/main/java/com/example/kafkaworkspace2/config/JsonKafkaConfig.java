@@ -1,6 +1,8 @@
 package com.example.kafkaworkspace2.config;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,15 +12,17 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.listener.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.ExponentialBackOff;
 import org.springframework.util.backoff.FixedBackOff;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Configuration
 @EnableKafka
@@ -66,8 +70,36 @@ public class JsonKafkaConfig {
 
     @Bean
     @Primary
+    CommonErrorHandler errorHandler() {
+        CommonContainerStoppingErrorHandler cseh = new CommonContainerStoppingErrorHandler();
+        AtomicReference<Consumer<? ,?>> consumer2 = new AtomicReference<>();
+        AtomicReference<MessageListenerContainer> container2 = new AtomicReference<>();
+
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler((rec, ex) -> {
+            cseh.handleRemaining(ex, Collections.singletonList(rec), consumer2.get(), container2.get());
+        }, generateBackOff()) {
+
+            @Override
+            public void handleRemaining(
+                    Exception thrownException,
+                    List<ConsumerRecord<?, ?>> records,
+                    Consumer<?, ?> consumer,
+                    MessageListenerContainer container
+            ) {
+                consumer2.set(consumer);
+                container2.set(container);
+                super.handleRemaining(thrownException, records, consumer, container);
+            }
+        };
+        errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
+        return errorHandler;
+    }
+
+    @Bean
+    @Primary
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
-            ConsumerFactory<String, Object> consumerFactory
+            ConsumerFactory<String, Object> consumerFactory,
+            CommonErrorHandler errorHandler
     ) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
@@ -82,12 +114,22 @@ public class JsonKafkaConfig {
 //        DefaultErrorHandler errorHandler = new DefaultErrorHandler();
 //        DefaultErrorHandler errorHandler = new DefaultErrorHandler(new FixedBackOff(1000L, 2L));
 //        DefaultErrorHandler errorHandler = new DefaultErrorHandler(new FixedBackOff(1000L, 2L));
-        DefaultErrorHandler errorHandler = new DefaultErrorHandler(generateBackOff());
-        /**
-         * addNotRetryableExceptions: IllegalArgumentException이 발생하면 Retry하지 않겠다.
-         */
-        errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
+//        DefaultErrorHandler errorHandler = new DefaultErrorHandler(generateBackOff());
+//        /**
+//         * addNotRetryableExceptions: IllegalArgumentException이 발생하면 Retry하지 않겠다.
+//         */
+//        errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
+//
+//        factory.setCommonErrorHandler(errorHandler);
 
+        /**
+         * CommonContainerStoppingErrorHandler: 에러발생시 컨슈마 중지
+         */
+//        factory.setCommonErrorHandler(new CommonContainerStoppingErrorHandler());
+
+        /**
+         * 커스텀 에러 핸들러: 위의 errorHandler 빈 확인
+         */
         factory.setCommonErrorHandler(errorHandler);
 
         // 수동 커밋 설정
