@@ -18,6 +18,6 @@ public class JsCdcProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void sendMessage(JsCdcMessage message) throws JsonProcessingException {
-        kafkaTemplate.send(JS_CDC_TOPIC, objectMapper.writeValueAsString(message));
+        kafkaTemplate.send(JS_CDC_TOPIC, String.valueOf(message.getId()),objectMapper.writeValueAsString(message));
     }
 }

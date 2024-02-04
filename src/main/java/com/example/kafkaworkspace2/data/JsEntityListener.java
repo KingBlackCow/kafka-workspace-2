@@ -8,11 +8,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class JsEntityListener {
 
     @Lazy
@@ -38,13 +40,13 @@ public class JsEntityListener {
 
     @PostUpdate
     public void handleUpdate(JsEntity jsEntity) {
-        System.out.println("handleUpdate");
-        JsDTO myModel = JsConverter.toDTO(jsEntity);
+        log.info("handleUpdate");
+        JsDTO jsDTO = JsConverter.toDTO(jsEntity);
         try {
             jsCdcProducer.sendMessage(
                     JsConverter.toMessage(
-                    myModel.getId(),
-                    myModel,
+                    jsDTO.getId(),
+                    jsDTO,
                     OperationType.UPDATE
                 )
             );
