@@ -111,7 +111,6 @@ public class JsonKafkaConfig {
 
 //        DefaultErrorHandler errorHandler = new DefaultErrorHandler();
 //        DefaultErrorHandler errorHandler = new DefaultErrorHandler(new FixedBackOff(1000L, 2L));
-//        DefaultErrorHandler errorHandler = new DefaultErrorHandler(new FixedBackOff(1000L, 2L));
 //        DefaultErrorHandler errorHandler = new DefaultErrorHandler(generateBackOff());
 //        /**
 //         * addNotRetryableExceptions: IllegalArgumentException이 발생하면 Retry하지 않겠다.
