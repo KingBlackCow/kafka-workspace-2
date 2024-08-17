@@ -24,7 +24,7 @@ public class JsonConsumer {
     @KafkaListener(
             topics = { JS_JSON_TOPIC },
             groupId = "test-consumer-group",
-            concurrency = "1"
+            concurrency = "3"
     )
     public void listen(ConsumerRecord<String, String> message, Acknowledgment acknowledgment) throws JsonProcessingException {
         Message myMessage = objectMapper.readValue(message.value(), Message.class);
@@ -32,11 +32,11 @@ public class JsonConsumer {
         acknowledgment.acknowledge();
     }
 
-    private void printPayloadIfFirstMessage(Message myMessage) {
-        if (idHistoryMap.putIfAbsent(String.valueOf(myMessage.getId()), 1) == null) {
-            System.out.println("[Main Consumer(" + Thread.currentThread().getId() + ")] Message arrived! - " + myMessage); // Exactly Once 실행되어야 하는 로직으로 가정
+    private void printPayloadIfFirstMessage(Message message) {
+        if (idHistoryMap.putIfAbsent(String.valueOf(message.getId()), 1) == null) {
+            log.info("[Main Consumer(" + Thread.currentThread().getId() + ")] Message arrived! - " + message); // Exactly Once 실행되어야 하는 로직으로 가정
         } else {
-            System.out.println("[Main Consumer(" + Thread.currentThread().getId() + ")] Duplicate! (" + myMessage.getId() + ")");
+            log.info("[Main Consumer(" + Thread.currentThread().getId() + ")] Duplicate! (" + message.getId() + ")");
         }
     }
 }

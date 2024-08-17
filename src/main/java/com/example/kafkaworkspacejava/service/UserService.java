@@ -16,27 +16,27 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserJpaRepository jsJpaRepository;
+    private final UserJpaRepository userJpaRepository;
 
     public List<UserDTO> findAll() {
-        List<User> entities = jsJpaRepository.findAll();
+        List<User> entities = userJpaRepository.findAll();
         return entities.stream().map(UserConverter::toDTO).toList();
     }
 
     public UserDTO findById(Integer id) {
-        Optional<User> entity = jsJpaRepository.findById(id);
+        Optional<User> entity = userJpaRepository.findById(id);
         return entity.map(UserConverter::toDTO).orElse(null);
     }
 
     @Transactional
     public UserDTO save(UserDTO model) {
         OperationType operationType = model.getId() == null ? OperationType.CREATE : OperationType.UPDATE;
-        User entity = jsJpaRepository.save(UserConverter.toEntity(model));
+        User entity = userJpaRepository.save(UserConverter.toEntity(model));
         return UserConverter.toDTO(entity);
     }
 
     @Transactional
     public void delete(Integer id) {
-        jsJpaRepository.deleteById(id);
+        userJpaRepository.deleteById(id);
     }
 }

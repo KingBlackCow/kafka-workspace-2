@@ -30,7 +30,7 @@ public class CdcConsumer {
         UserCdcMessage userCdcMessage = objectMapper.readValue(message.value(), UserCdcMessage.class);
         log.info(retryPrint + "[Cdc Consumer] " + userCdcMessage.getOperationType() + " Message arrived! (id: " + userCdcMessage.getId() + ") - " + userCdcMessage.getPayload() + " / time: " + LocalDateTime.now());
         retryCount++;
-        throw new RuntimeException("Someting happend");
-//        acknowledgment.acknowledge();
+//        throw new RuntimeException("Someting happend");
+        acknowledgment.acknowledge();
     }
 }

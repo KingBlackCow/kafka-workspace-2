@@ -27,7 +27,7 @@ public class JsonKafkaConfig {
 
     @Bean
     @Primary
-    @ConfigurationProperties("spring.kafka.string")
+    @ConfigurationProperties("spring.kafka.json")
     public KafkaProperties kafkaProperties() {
         return new KafkaProperties();
     }
