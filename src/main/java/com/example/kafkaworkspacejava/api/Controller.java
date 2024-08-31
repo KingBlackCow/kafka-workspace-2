@@ -42,7 +42,7 @@ public class Controller {
     }
 
     @PostMapping("/greetings")
-    UserDTO create(@RequestBody Request request) throws JsonProcessingException {
+    UserDTO create(@RequestBody Request request) {
         if (request == null || request.userId == null || request.userName == null || request.userAge == null || request.content == null)
             return null;
 
